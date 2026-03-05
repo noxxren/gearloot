@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>...</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Courier New', monospace;
+            background: #1c1c1c;
+            color: #e1e1e1;
+            text-align: center;
+            padding: 20px;
+            overflow: hidden;
+        }
+        .container {
+            position: relative;
+        }
+        .symbol {
+            font-size: 4rem;
+            letter-spacing: .25rem;
+            margin-bottom: 3rem;
+            opacity: 0.15;
+            animation: pulse 3s ease-in-out infinite;
+        }
+        .text {
+            font-size: 1.6rem;
+            letter-spacing: 0.5rem;
+            text-transform: uppercase;
+            opacity: 0;
+            animation: fadeIn 2s ease-in forwards;
+            animation-delay: 1s;
+        }
+        .subtext {
+            font-size: 1.6rem;
+            letter-spacing: 0.3rem;
+            margin-top: 2rem;
+            opacity: 0;
+            animation: fadeIn 2s ease-in forwards;
+            animation-delay: 2s;
+            color: #909090;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 0.1; }
+            50% { opacity: 0.25; }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 0.4; transform: translateY(0); }
+        }
+        .glitch {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="symbol">◇ ◇ ◇</div>
+        <div class="text">Something is coming</div>
+        <div class="subtext">wait...</div>
+    </div>
+</body>
+</html>
