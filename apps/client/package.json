@@ -14,20 +14,22 @@
     "lint": "eslint . --ext .js,.ts,.vue --fix --ignore-path .gitignore"
   },
   "dependencies": {
-    "@nuxt/ui": "latest",
+    "@nuxt/ui": "^4.5.1",
+    "@nuxtjs/i18n": "latest",
     "@pinia/nuxt": "latest",
     "@vueuse/nuxt": "latest",
-    "vee-validate": "latest",
-    "zod": "latest",
-    "pinia": "latest",
-    "@nuxtjs/i18n": "latest",
     "axios": "latest",
-    "vue": "^3.4.0"
+    "pinia": "latest",
+    "tailwindcss": "^4.2.1",
+    "vee-validate": "latest",
+    "vue": "^3.4.0",
+    "zod": "latest"
   },
   "devDependencies": {
     "@nuxt/devtools": "latest",
     "typescript": "^5.3.3",
     "vue-tsc": "^2.0.0",
-    "@types/node": "^22.0.0"
+    "@types/node": "^22.0.0",
+    "nuxt": "^4.3.1"
   }
 }

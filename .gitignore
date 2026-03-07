@@ -53,4 +53,8 @@ coverage/
 # Temporary files
 tmp/
 temp/
+docs/
 *.tmp
+
+# Documentation
+ASID
