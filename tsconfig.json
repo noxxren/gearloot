@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "lib": ["ESNext"],
+    "moduleResolution": "bundler",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "allowJs": true,
+    "noEmit": true,
+    "composite": true,
+    "paths": {
+      "@gearloot/shared/*": ["./packages/shared/src/*"],
+      "@gearloot/server/*": ["./apps/server/src/*"],
+      "@gearloot/database/*": ["./apps/database/src/*"]
+    }
+  },
+  "exclude": ["node_modules", "dist", "build", ".nuxt", ".output"]
+}

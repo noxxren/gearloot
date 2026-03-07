@@ -1,0 +1,17 @@
+{
+  "name": "@gearloot/database",
+  "version": "0.1.0",
+  "private": true,
+  "description": "GearLoot database migrations and seeds",
+  "scripts": {
+    "migrate": "bun run migrations/migrate.ts",
+    "migrate:rollback": "bun run migrations/rollback.ts",
+    "migrate:fresh": "bun run migrations/fresh.ts",
+    "seed": "bun run seeds/seed.ts"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@types/bun": "latest",
+    "typescript": "^5.3.3"
+  }
+}

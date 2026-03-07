@@ -1,0 +1,36 @@
+{
+  "name": "gearloot",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Marketplace aplikacja dla społeczności LARP/Rekonstrukcje/Cosplay - Nuxt 4.3.1, Bun, Hono, TypeScript",
+  "author": "noxxren",
+  "license": "MIT",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "bun run --filter \"*\" dev",
+    "dev:server": "bun run --filter @gearloot/server dev",
+    "dev:client": "bun run --filter @gearloot/client dev",
+    "build": "bun run --filter \"*\" build",
+    "build:server": "bun run --filter @gearloot/server build",
+    "build:client": "bun run --filter @gearloot/client build",
+    "test": "bun test",
+    "test:server": "bun run --filter @gearloot/server test",
+    "test:client": "bun run --filter @gearloot/client test",
+    "lint": "bun run --filter \"*\" lint",
+    "format": "prettier --write \"**/*.{js,ts,tsx,jsx,vue,json,md}\"",
+    "typecheck": "bun run --filter \"*\" typecheck",
+    "db:migrate": "bun run --filter @gearloot/database migrate",
+    "db:seed": "bun run --filter @gearloot/database seed"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@typescript-eslint/eslint-plugin": "^8.54.0",
+    "@typescript-eslint/parser": "^8.54.0",
+    "eslint": "^9.39.2",
+    "prettier": "^3.2.4",
+    "typescript": "^5.3.3"
+  }
+}
