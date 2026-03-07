@@ -1,187 +1,289 @@
-# Getting Started with Honokit
+# Getting Started with GearLoot
 
-Welcome to Honokit! This guide will help you set up and run the project locally.
+Welcome to GearLoot! This guide will help you set up and run the project locally.
+
+## Branch GL-0001 Overview
+
+**Branch:** `feature/GL-0001` contains the initial project structure:
+
+- ✅ **Monorepo structure** with Bun workspaces
+- ✅ **Backend (Bun + Hono)** - API server with auth and user routes
+- ✅ **Client (Nuxt 4.3.1)** - Vue 3 frontend with Nuxt UI
+- ✅ **Database** - Migrations and seeds structure
+- ✅ **Shared packages** - Common types and utilities
+- ✅ **CI/CD** - GitHub Actions workflows
 
 ## Prerequisites
 
 - **Bun** >= 1.0.0 - [Install Bun](https://bun.sh/docs/installation)
 - **Node.js** >= 18.0.0 (for frontend tools)
-- **Database**: PostgreSQL or SQLite
 
 ## Installation
 
-### 1. Clone the repository
+### 1. Clone repository
 
 ```bash
-git clone https://github.com/yourusername/honokit.git
-cd honokit
+git clone https://github.com/noxxren/gearloot.git
+cd gearloot
 ```
 
-### 2. Install dependencies
+### 2. Switch to GL-0001 branch
+
+```bash
+git checkout feature/GL-0001
+```
+
+### 3. Install dependencies
 
 ```bash
 # Install all workspace dependencies
 bun install
 ```
 
-### 3. Set up environment variables
-
-```bash
-# Backend
-cp apps/backend/.env.example apps/backend/.env
-# Edit apps/backend/.env and fill in your values
-
-# Frontend
-cp apps/frontend/.env.example apps/frontend/.env
-# Edit apps/frontend/.env and fill in your values
-```
-
-### 4. Generate encryption keys
-
-```bash
-# ENCRYPTION_KEY (32 bytes)
-bun run -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
-
-# JWT_SECRET (64 bytes)
-bun run -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
-```
-
-Add these to `apps/backend/.env`:
-```
-ENCRYPTION_KEY=<generated_key_here>
-JWT_SECRET=<generated_secret_here>
-```
-
-### 5. Set up the database
-
-```bash
-# Run migrations
-bun run db:migrate
-
-# (Optional) Seed with test data
-bun run db:seed
-```
-
-### 6. Set up Google OAuth
-
-1. Go to [Google Cloud Console](https://console.cloud.google.com/)
-2. Create a new project (or use existing)
-3. Enable Google+ API
-4. Create OAuth 2.0 credentials
-   - Authorized redirect URIs: `http://localhost:3000/auth/google/callback`
-5. Copy Client ID and Client Secret to `apps/backend/.env`:
-
-```
-GOOGLE_CLIENT_ID=your_client_id
-GOOGLE_CLIENT_SECRET=your_client_secret
-```
+This installs dependencies for:
+- `apps/client` - Nuxt 4.3.1 with Nuxt UI
+- `apps/server` - Bun + Hono backend
+- `apps/database` - Database migrations
+- `packages/shared` - Shared types and utilities
 
 ## Running the Project
 
 ### Development Mode (Recommended)
 
-Run both backend and frontend in parallel:
+Run all apps in parallel:
 
 ```bash
 bun run dev
 ```
 
 This starts:
-- Backend API: http://localhost:3000
-- Frontend: http://localhost:5173
+- **Backend API**: http://localhost:3000
+- **Frontend (Nuxt)**: http://localhost:3001
 
 ### Run Separately
 
 ```bash
 # Terminal 1 - Backend
-bun run dev:backend
+bun run dev:server
 
 # Terminal 2 - Frontend
-bun run dev:frontend
+bun run dev:client
 ```
+
+### Frontend Development Server
+
+```bash
+cd apps/client
+bun run dev
+```
+
+The Nuxt dev server starts on:
+- **URL**: http://localhost:3001
+- **DevTools**: Press `Shift + Alt + D` in browser
+- **Hot Module Replacement**: Automatic with HMR
+
+### Backend Development Server
+
+```bash
+cd apps/server
+bun run dev
+```
+
+The Hono server starts on:
+- **URL**: http://localhost:3000
+- **Watch mode**: Auto-restart on file changes
 
 ## Project Structure
 
 ```
-honokit/
+gearloot/
 ├── apps/
-│   ├── backend/       # Bun + Hono API server
-│   ├── frontend/      # Vue 3 + TypeScript SPA
-│   └── database/      # Migrations and seeds
+│   ├── client/          # Nuxt 4.3.1 + TypeScript frontend
+│   ├── server/          # Bun + Hono API backend
+│   └── database/       # Migrations and seeds
 ├── packages/
-│   └── shared/        # Shared types and utilities
+│   └── shared/         # Shared types and utilities
 ├── docs/              # Documentation
 └── .github/           # GitHub Actions workflows
 ```
 
-## Testing
+### Client (Nuxt 4.3.1)
+
+- **Framework**: Vue 3 + Nuxt 4.3.1
+- **UI Library**: Nuxt UI 4.5.1 (125+ components)
+- **State Management**: Pinia
+- **Routing**: File-based (pages/ directory)
+- **Forms**: vee-validate + Zod
+- **HTTP**: axios + useFetch (Nuxt built-in)
+- **Internationalization**: @nuxtjs/i18n
+
+### Server (Bun + Hono)
+
+- **Runtime**: Bun
+- **Framework**: Hono 4.0.0
+- **Type Safety**: TypeScript 5.3.3
+- **Routes**:
+  - `/auth` - Authentication routes
+  - `/users` - User management routes
+
+### Database
+
+- **Migrations**: `apps/database/migrations/`
+- **Seeds**: `apps/database/seeds/`
+- **Schema docs**: `apps/database/schema/`
+
+## Available Scripts
+
+### Development
 
 ```bash
-# Run all tests
-bun test
-
-# Test backend
-bun run test:backend
-
-# Test frontend
-bun run test:frontend
+bun run dev              # Start all apps (server + client)
+bun run dev:server       # Start backend only
+bun run dev:client       # Start frontend only
 ```
 
-## Building for Production
+### Building
 
 ```bash
-# Build all apps
-bun run build
+bun run build            # Build all apps
+bun run build:server     # Build backend
+bun run build:client     # Build frontend
+```
 
-# Build individually
-bun run build:backend
-bun run build:frontend
+### Database
+
+```bash
+bun run db:migrate       # Run migrations
+bun run db:seed          # Seed database
+```
+
+### Code Quality
+
+```bash
+bun run typecheck        # Type check all packages
+bun run lint             # Lint code
+bun run format           # Format code with Prettier
+```
+
+## Nuxt UI Configuration
+
+The app uses [Nuxt UI](https://ui.nuxt.com/) for UI components.
+
+**Global theme configuration** (`apps/client/app.config.ts`):
+```typescript
+export default defineAppConfig({
+  ui: {
+    colors: {
+      primary: 'primary-500',  // Elastic color for theming
+      neutral: 'zinc'
+    },
+    icons: {
+      // Custom icon mappings with Phosphor Icons
+    }
+  }
+})
+```
+
+**Nuxt config** (`apps/client/nuxt.config.ts`):
+```typescript
+export default defineNuxtConfig({
+  modules: [
+    '@nuxt/ui',
+    '@pinia/nuxt',
+    '@vueuse/nuxt',
+    '@nuxtjs/i18n'
+  ],
+  devServer: { port: 3001 }
+})
 ```
 
 ## Common Issues
 
 ### Port Already in Use
 
-If port 3000 or 5173 is already in use:
+If port 3000 (backend) or 3001 (frontend) is already in use:
 
 ```bash
-# Change PORT in apps/backend/.env
-PORT=3001
+# Change backend port in apps/server/src/index.ts
+const port = 3001
 
-# Vite will automatically try next available port
+# Change frontend port in apps/client/nuxt.config.ts
+devServer: { port: 3002 }
 ```
 
-### Database Connection Error
+### Dependencies Not Found
 
-Make sure your `DATABASE_URL` is correct in `apps/backend/.env`:
+If you see "bun: command not found: nuxt":
 
 ```bash
-# PostgreSQL
-DATABASE_URL=postgresql://username:password@localhost:5432/honokit_dev
-
-# SQLite (easier for development)
-DATABASE_URL=sqlite://./honokit.db
+cd apps/client
+bun install
 ```
 
-### Encryption Key Missing
+This ensures Nuxt is installed locally.
 
-If you see "ENCRYPTION_KEY must be 32-byte hex string":
+## Implementing New Features
 
-1. Generate a key: `bun run -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`
-2. Add to `apps/backend/.env`
-3. Restart the server
+**Ważne przy implementacji każdej nowej funkcji:**
+
+### Loading States & Skeleton Components
+
+Każda nowa funkcja musi implementować loading states:
+
+1. **Composable/Store z loading state:**
+   ```typescript
+   const { data, loading, error } = useFeature()
+   ```
+
+2. **Skeleton component dla każdego widoku:**
+   ```vue
+   <USkeletonCard v-if="loading" />
+   <ProductCard v-else-if="data" />
+   <ErrorCard v-else-if="error" />
+   ```
+
+3. **Dostępne skeleton components w Nuxt UI:**
+   - `USkeleton` - podstawowy
+   - `USkeletonCard` - dla kart produktów
+   - `USkeletonList` - dla list
+
+### Flow implementacji nowej funkcji:
+
+1. **Utwórz composable** - np. `composables/useFeature.ts`
+2. **Dodaj API endpoint** - np. `GET /api/feature`
+3. **Utwórz page component** - np. `pages/feature/index.vue`
+4. **Utwórz skeleton components** - np. `components/FeatureSkeleton.vue`
+5. **Implementuj loading state** - skeleton → dane → błąd
+6. **Testuj manualnie** - sprawdź loading states w DevTools
+7. **Commit z clear message** - opisz co zostało zrobione
+
+**Przykład:**
+```
+Feature: Marketplace listings
+- Composable: useMarketplace.ts
+- Page: pages/marketplace/index.vue
+- Skeleton: components/ProductSkeleton.vue
+- API: GET /api/listings
+- Loading flow: USkeletonCard → ProductCard[]
+```
+
+### Dokumentacja po implementacji:
+
+Aktualizuj odpowiednie pliki:
+- `docs/ARCHITECTURE.md` - dodaj nowe routes/flows
+- `docs/GETTING_STARTED.md` - opisz nowe features
 
 ## Next Steps
 
-- Read the [Architecture Documentation](./ARCHITECTURE.md)
-- Check out the [API Documentation](./API.md)
-- Learn about [Data Encryption Strategy](../apps/backend/src/lib/README.md)
-- Set up your IDE with [Development Setup](./DEVELOPMENT.md)
+- Read [Architecture Documentation](./ARCHITECTURE.md)
+- Check out [API Documentation](./API.md)
+- Learn about [Nuxt UI](https://ui.nuxt.com/)
+- Explore Nuxt 4.3.1 features
 
 ## Need Help?
 
 - Check [FAQ](./FAQ.md)
 - Open an issue on GitHub
-- Read the code comments and README files in each directory
+- Read code comments and README files in each directory
 
 Happy coding! 🚀

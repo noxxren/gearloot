@@ -1,12 +1,12 @@
-# Honokit Architecture
+# GearLoot Architecture
 
-This document describes the high-level architecture of Honokit.
+This document describes the high-level architecture of GearLoot.
 
 ## Overview
 
-Honokit is a **monorepo** containing a fullstack TypeScript application with:
+GearLoot is a **monorepo** containing a fullstack TypeScript application with:
 - **Backend**: Bun runtime + Hono web framework
-- **Frontend**: Vue 3 + TypeScript SPA
+- **Frontend**: Nuxt 4.3.1 + Vue 3 + TypeScript
 - **Database**: PostgreSQL/SQLite with migrations
 - **Shared**: Common types and utilities
 
@@ -15,88 +15,84 @@ Honokit is a **monorepo** containing a fullstack TypeScript application with:
 ```
 ┌─────────────────────────────────────────────────────────┐
 │                      Client (Browser)                    │
-│                    Vue 3 + TypeScript                    │
-│              (http://localhost:5173 in dev)             │
-└────────────────────────┬────────────────────────────────┘
-                         │
-                         │ HTTP/HTTPS
-                         │ (CORS enabled in dev)
-                         │
-┌────────────────────────▼────────────────────────────────┐
-│                 Backend API (Bun + Hono)                │
-│              (http://localhost:3000 in dev)             │
+│                  Nuxt 4.3.1 + Vue 3                   │
+│            (http://localhost:3001 in dev)             │
+└────────────────────────┬────────────────────────────────────────┘
+                     │
+                     │ HTTP/HTTPS
+                     │ (CORS enabled in dev)
+                     │
+┌──────────────────────▼────────────────────────────────────┐
+│              Backend API (Bun + Hono)              │
+│          (http://localhost:3000 in dev)             │
 │                                                          │
 │  ┌────────────────────────────────────────────────┐    │
-│  │  Routes (auth, users, etc.)                    │    │
+│  │  Routes (auth, users, marketplace)     │    │
 │  └──────────────┬─────────────────────────────────┘    │
-│                 │                                        │
+│                 │                                      │
 │  ┌──────────────▼─────────────────────────────────┐    │
-│  │  Middleware (auth, validation, rate limit)     │    │
+│  │  Middleware (auth, validation, CORS)   │    │
 │  └──────────────┬─────────────────────────────────┘    │
-│                 │                                        │
+│                 │                                      │
 │  ┌──────────────▼─────────────────────────────────┐    │
-│  │  Business Logic (services, controllers)        │    │
+│  │  Business Logic (services, controllers)  │    │
 │  └──────────────┬─────────────────────────────────┘    │
-│                 │                                        │
+│                 │                                      │
 │  ┌──────────────▼─────────────────────────────────┐    │
-│  │  Encryption Layer (encrypt/decrypt PII)        │    │
+│  │  Database Layer (Prisma ORM)           │    │
 │  └──────────────┬─────────────────────────────────┘    │
-│                 │                                        │
-│  ┌──────────────▼─────────────────────────────────┐    │
-│  │  Database Layer (query builder, ORM)           │    │
-│  └──────────────┬─────────────────────────────────┘    │
-└─────────────────┼──────────────────────────────────────┘
+└─────────────────┼────────────────────────────────────────────┘
                   │
-┌─────────────────▼──────────────────────────────────────┐
-│         Database (PostgreSQL / SQLite)                  │
-│           - TDE (Transparent Data Encryption)           │
-│           - Encrypted PII fields                        │
-│           - Hashed passwords (Argon2id)                 │
-└─────────────────────────────────────────────────────────┘
+┌─────────────────▼──────────────────────────────────────────────┐
+│         Database (PostgreSQL / SQLite)                   │
+│              - Users, Listings, Messages                    │
+│              - Encrypted PII (email, name)                │
+│              - Hashed passwords (Argon2id)                 │
+└──────────────────────────────────────────────────────────────────┘
 ```
 
 ## Directory Structure
 
 ```
-honokit/
+gearloot/
 ├── apps/
-│   ├── backend/              # Backend API server
+│   ├── client/              # Nuxt 4.3.1 + TypeScript frontend
+│   │   ├── pages/            # File-based routing
+│   │   ├── components/       # Vue components
+│   │   ├── composables/     # Vue composables
+│   │   ├── layouts/          # Nuxt layouts
+│   │   ├── plugins/          # Nuxt plugins
+│   │   ├── assets/           # Static assets (CSS, images)
+│   │   ├── app.vue          # Root component
+│   │   ├── app.config.ts    # Global app config (Nuxt UI)
+│   │   └── nuxt.config.ts   # Nuxt framework config
+│   │
+│   ├── server/              # Backend API server
 │   │   ├── src/
 │   │   │   ├── routes/       # API route handlers
 │   │   │   ├── middleware/   # Request/response middleware
-│   │   │   ├── lib/          # Utilities (encryption, db, etc.)
-│   │   │   ├── types/        # Backend-specific types
+│   │   │   ├── lib/          # Utilities (db, helpers)
+│   │   │   ├── controllers/  # Request controllers
+│   │   │   ├── services/     # Business logic
 │   │   │   ├── config/       # Configuration files
+│   │   │   ├── mocks/        # Mock data
 │   │   │   └── index.ts      # Entry point
 │   │   ├── tests/            # Backend tests
 │   │   └── package.json
 │   │
-│   ├── frontend/             # Frontend SPA
-│   │   ├── src/
-│   │   │   ├── components/   # Vue components
-│   │   │   ├── views/        # Page components
-│   │   │   ├── composables/  # Vue composables
-│   │   │   ├── stores/       # Pinia stores
-│   │   │   ├── router/       # Vue Router config
-│   │   │   ├── api/          # API client
-│   │   │   ├── assets/       # Static assets
-│   │   │   ├── types/        # Frontend types
-│   │   │   └── main.ts       # Entry point
-│   │   └── package.json
-│   │
-│   └── database/             # Database management
+│   └── database/           # Database management
 │       ├── migrations/       # Schema migrations
 │       ├── seeds/            # Seed data
 │       └── schema/           # Schema documentation
 │
 ├── packages/
-│   └── shared/               # Shared code
+│   └── shared/             # Shared code
 │       ├── types/            # Shared TypeScript types
 │       ├── utils/            # Shared utilities
 │       └── constants/        # Shared constants
 │
-├── docs/                     # Documentation
-└── .github/                  # CI/CD workflows
+├── docs/                  # Documentation
+└── .github/               # CI/CD workflows
 ```
 
 ## Key Technologies
@@ -105,191 +101,212 @@ honokit/
 
 - **Runtime**: [Bun](https://bun.sh/) - Fast all-in-one JavaScript runtime
 - **Framework**: [Hono](https://hono.dev/) - Lightweight, fast web framework
-- **Language**: TypeScript
+- **Language**: TypeScript 5.3.3
 - **Database**: PostgreSQL (prod) / SQLite (dev)
-- **Auth**: JWT + Google OAuth 2.0
-- **Encryption**: XChaCha20-Poly1305 (via @noble/ciphers)
-- **Password Hashing**: Argon2id (built into Bun)
+- **ORM**: Prisma (planned)
 
 ### Frontend
 
-- **Framework**: [Vue 3](https://vuejs.org/) - Progressive JavaScript framework
-- **Language**: TypeScript
+- **Framework**: [Nuxt 4.3.1](https://nuxt.com/) - Vue 3 meta-framework
+- **UI Library**: [Nuxt UI 4.5.1](https://ui.nuxt.com/) - 125+ components
 - **State Management**: [Pinia](https://pinia.vuejs.org/)
-- **Routing**: [Vue Router](https://router.vuejs.org/)
-- **Styling**: [Tailwind CSS](https://tailwindcss.com/)
-- **Build Tool**: [Vite](https://vitejs.dev/)
-- **Testing**: [Vitest](https://vitest.dev/)
+- **Styling**: Tailwind CSS (included with Nuxt UI)
+- **Routing**: File-based (pages/ directory)
+- **Forms**: vee-validate v5 + Zod
+- **HTTP**: axios + useFetch (Nuxt built-in)
+- **Internationalization**: @nuxtjs/i18n v9
+
+### Loading States & Skeletons
+
+**REQUIREMENT:** W każdej nowej funkcji należy pamiętać o **loading states** i utworzyć **skeleton components** do wyświetlania podczas ładowania danych.
+
+**Implementacja:**
+1. **Loading state** - flaga `loading: boolean` w composables/stores
+2. **Skeleton components** - komponenty zastępcze (SkeletonCard, SkeletonList, itp.)
+3. **Wyświetlanie:**
+   - Podczas ładowania danych → pokaż skeleton
+   - Po załadowaniu → pokaż prawdziwe dane
+   - W przypadku błędu → pokaż komponent błędu
+
+**Przykład:**
+```vue
+<script setup>
+const { data, loading, error } = useMarketplace()
+</script>
+
+<template>
+  <!-- Skeleton podczas ładowania -->
+  <SkeletonCard v-if="loading" />
+
+  <!-- Prawdziwe dane po załadowaniu -->
+  <ProductCard v-else-if="data" :product="data" />
+
+  <!-- Błąd -->
+  <ErrorCard v-else-if="error" />
+</template>
+```
+
+**Dostępne skeleton components w Nuxt UI:**
+- `USkeleton` - podstawowy skeleton
+- `USkeletonCard` - skeleton dla kart (np. ProductCard)
+- `USkeletonList` - skeleton dla list
+
+**Pamiętaj:** Implementacja loading states i skeleton components jest **OBOWIĄ** przy każdej nowej funkcji wypisującej dane z API.
 
 ### Shared
 
 - **Type Sharing**: TypeScript interfaces shared between frontend and backend
-- **Validation**: Shared validation logic
-- **Constants**: API endpoints, error codes, etc.
+- **Validation**: Shared validation logic (Zod schemas)
+- **Constants**: API endpoints, error codes
+
+## API Routes
+
+### Authentication (`/auth`)
+- `POST /auth/google` - Initiate Google OAuth
+- `GET /auth/google/callback` - OAuth callback
+- `POST /auth/login` - Email/password login (planned)
+- `POST /auth/register` - User registration (planned)
+- `GET /auth/me` - Get current user profile
+
+### Users (`/users`)
+- `GET /users/:id` - Get user profile
+- `PUT /users/:id` - Update user profile
+- `GET /users/:id/listings` - Get user's marketplace listings
+
+### Marketplace (planned)
+- `GET /listings` - Browse marketplace listings
+- `POST /listings` - Create new listing
+- `PUT /listings/:id` - Update listing
+- `DELETE /listings/:id` - Delete listing
+
+### Chat (planned)
+- `GET /chats/:id` - Get chat messages
+- `POST /chats/:id` - Send message
+- `GET /chats` - List user chats
 
 ## Data Flow
 
-### Authentication Flow (Google OAuth)
-
+### Marketplace Browsing
 ```
-1. User clicks "Sign in with Google" (Frontend)
-   ↓
-2. Redirect to /api/auth/google (Backend)
-   ↓
-3. Backend redirects to Google OAuth consent page
-   ↓
-4. User authorizes (Google)
-   ↓
-5. Google redirects back to /api/auth/google/callback (Backend)
-   ↓
-6. Backend:
-   - Exchanges code for tokens
-   - Fetches user profile from Google
-   - Checks if user exists in DB
-     - If not: creates new user (encrypted PII)
-     - If yes: updates OAuth tokens
-   - Generates JWT token
-   ↓
-7. Backend redirects to Frontend with JWT token
-   ↓
-8. Frontend stores JWT (httpOnly cookie or localStorage)
-   ↓
-9. Frontend fetches user data from /api/auth/me
-   ↓
-10. User is logged in
+1. Frontend: User navigates to /marketplace
+2. Frontend: useFetch('/api/listings?filter=larp')
+3. Backend: Route handler receives request
+4. Backend: Middleware chain (CORS, validation)
+5. Backend: Service queries database (Prisma)
+6. Backend: Response with listings data
+7. Frontend: Nuxt displays listings (ProductCard components)
 ```
 
-### API Request Flow (Authenticated)
+### Creating a Listing
+```
+1. Frontend: User fills out listing form
+2. Frontend: vee-validate validates with Zod schema
+3. Frontend: POST /api/listings with JWT token
+4. Backend: Auth middleware verifies JWT
+5. Backend: Validation middleware validates request body
+6. Backend: Service saves listing to database
+7. Backend: Response with created listing
+8. Frontend: Nuxt navigates to listing detail
+```
 
+## Nuxt UI Configuration
+
+The app uses [Nuxt UI](https://ui.nuxt.com/) for UI components.
+
+**Global theme configuration** (`apps/client/app.config.ts`):
+```typescript
+export default defineAppConfig({
+  ui: {
+    colors: {
+      primary: 'primary-500',  // Elastic color for theming
+      neutral: 'zinc'
+    },
+    icons: {
+      // Custom icon mappings with Phosphor Icons
+    }
+  }
+})
 ```
-1. Frontend makes request to /api/* with JWT token
-   ↓
-2. Backend receives request
-   ↓
-3. Middleware chain:
-   - Logger middleware (logs request)
-   - CORS middleware (checks origin)
-   - Auth middleware (verifies JWT)
-   - Rate limit middleware (prevents abuse)
-   - Validation middleware (validates request body)
-   ↓
-4. Route handler:
-   - Calls business logic service
-   - Service decrypts data if needed
-   - Service queries database
-   - Service encrypts sensitive data in response
-   ↓
-5. Response sent back to Frontend
-```
+
+**Key components available:**
+- Buttons, Cards, Inputs, Modals
+- Navigation, Dropdowns, Forms
+- Avatar, Badge, Skeleton
+- And 100+ more
 
 ## Security Architecture
 
-### Encryption Strategy
-
-See full documentation in [Data-Encryption-Strategy.md](../Architecture/Backend/Data-Encryption-Strategy.md)
-
-**Key Points:**
-- **Passwords**: Hashed with Argon2id (NOT encrypted)
-- **PII** (email, name): Encrypted with XChaCha20-Poly1305
-- **Searchable fields**: Dual storage (encrypted + hash)
-- **OAuth tokens**: Encrypted before storage
-- **Database**: TDE (Transparent Data Encryption) enabled
-- **Keys**: Stored in secrets manager (production)
-
 ### Authentication
-
 - **JWT tokens**: Signed with HS256
 - **Token expiry**: 7 days (refresh token: 30 days)
 - **Storage**: httpOnly cookies (CSRF protection)
-- **OAuth**: Google OAuth 2.0 with PKCE
+- **OAuth**: Google OAuth 2.0 (planned)
 
 ### API Security
-
 - **CORS**: Whitelist frontend origin
-- **Rate Limiting**: 100 requests/minute per IP
+- **Rate Limiting**: Prevent abuse (planned)
 - **Input Validation**: Zod schemas for all endpoints
-- **SQL Injection**: Parameterized queries
+- **SQL Injection**: Parameterized queries (Prisma)
 - **XSS**: Content Security Policy headers
-- **CSRF**: SameSite cookies + CSRF tokens
 
 ## Performance Considerations
 
 ### Backend
-
 - **Bun runtime**: ~3x faster than Node.js
 - **Hono framework**: ~10x faster than Express
 - **Connection pooling**: Reuse database connections
-- **Encryption caching**: Request-level cache for decrypted values
 
 ### Frontend
-
-- **Code splitting**: Routes loaded on demand
-- **Tree shaking**: Unused code eliminated
-- **Asset optimization**: Images compressed, lazy loaded
-- **Bundle size**: Target < 200KB initial bundle
-
-### Database
-
-- **Indexes**: On frequently queried columns (email_hash, user_id)
-- **Query optimization**: EXPLAIN ANALYZE for slow queries
-- **Connection pooling**: Max 20 connections
+- **File-based routing**: Code splitting by page
+- **Nuxt optimizations**: Automatic tree shaking
+- **Asset optimization**: Lazy loading, compression
+- **Bundle size**: Nuxt optimizations built-in
 
 ## Scalability
 
 ### Horizontal Scaling
-
 - **Stateless backend**: No session storage (JWT in cookies)
-- **Load balancer**: Round-robin across multiple backend instances
+- **Load balancer**: Round-robin across multiple instances
 - **Database**: Read replicas for scaling reads
 
 ### Vertical Scaling
-
-- **Bun's speed**: Can handle 100k+ req/s on single instance
+- **Bun's speed**: High request handling capacity
 - **Resource limits**: Set memory/CPU limits in production
 
 ## Monitoring & Logging
 
-- **Logging**: Structured JSON logs (winston/pino)
-- **Metrics**: Request duration, error rates, database queries
-- **Alerts**: Slack/email on critical errors
-- **Health checks**: `/health` endpoint for load balancer
+- **Logging**: Structured JSON logs (planned)
+- **Metrics**: Request duration, error rates (planned)
+- **Health checks**: `/health` endpoint for load balancer (planned)
 
 ## Deployment
 
 ### Development
-
 ```bash
 bun run dev  # Both frontend and backend
 ```
 
 ### Production
-
 ```bash
-# Build
-bun run build
-
-# Start
-bun run start
+bun run build  # Build all apps
+bun run start  # Start production server
 ```
 
 ### Recommended Hosting
-
 - **Backend**: Railway, Fly.io, Render
 - **Frontend**: Vercel, Netlify, Cloudflare Pages
 - **Database**: Neon (PostgreSQL), Railway, Supabase
 
 ## Future Enhancements
-
-- [ ] Microservices architecture (split backend into services)
-- [ ] GraphQL API (alternative to REST)
-- [ ] WebSocket support (real-time features)
-- [ ] Redis caching (session storage, rate limiting)
+- [ ] Prisma ORM integration
+- [ ] Real-time chat (WebSocket support)
+- [ ] Image upload moderation (AI)
+- [ ] Redis caching
 - [ ] Message queue (background jobs)
 - [ ] CDN integration (static assets)
 
 ## See Also
-
 - [Getting Started](./GETTING_STARTED.md)
 - [API Documentation](./API.md)
-- [Data Encryption Strategy](../Architecture/Backend/Data-Encryption-Strategy.md)
-- [Development Setup](./DEVELOPMENT.md)
+- [Nuxt UI Docs](https://ui.nuxt.com/)
+- [Nuxt Documentation](https://nuxt.com/)
